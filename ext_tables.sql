@@ -1,4 +1,4 @@
-CREATE TABLE tx_oauth2server_client (
+CREATE TABLE tx_oauth2server_domain_model_client (
     identifier    varchar(32)  DEFAULT ''  NOT NULL,
     name          varchar(255) DEFAULT ''  NOT NULL,
     secret        varchar(100) DEFAULT ''  NOT NULL,
@@ -6,7 +6,7 @@ CREATE TABLE tx_oauth2server_client (
     description   text
 );
 
-CREATE TABLE tx_oauth2server_accesstoken (
+CREATE TABLE tx_oauth2server_domain_model_accesstoken (
     identifier  varchar(255) DEFAULT '' NOT NULL,
     scopes      varchar(255) DEFAULT '' NOT NULL,
     client_id   varchar(32)  DEFAULT '' NOT NULL,

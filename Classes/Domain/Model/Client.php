@@ -9,13 +9,14 @@ use League\OAuth2\Server\Entities\Traits\ClientTrait;
 use League\OAuth2\Server\Entities\Traits\EntityTrait;
 use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /**
  * OAuth2 client
  *
  * @phpstan-import-type TClientRow from ClientRepository
  */
-final class Client implements ClientEntityInterface
+final class Client extends AbstractEntity implements ClientEntityInterface
 {
     use EntityTrait;
     use ClientTrait;
