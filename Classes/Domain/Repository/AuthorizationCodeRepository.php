@@ -11,7 +11,7 @@ use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
 /**
  * Repository for OAuth2 authorization codes
  */
-final class AuthorizationCodeRepository implements AuthCodeRepositoryInterface
+final class AuthorizationCodeRepository extends AbstractRepository implements AuthCodeRepositoryInterface
 {
     /**
      * @inheritDoc

@@ -11,7 +11,7 @@ use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 /**
  * Repository for OAuth2 scopes
  */
-final class ScopeRepository implements ScopeRepositoryInterface
+final class ScopeRepository extends AbstractRepository implements ScopeRepositoryInterface
 {
     /**
      * Return information about a scope.

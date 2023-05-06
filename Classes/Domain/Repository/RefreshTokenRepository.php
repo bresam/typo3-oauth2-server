@@ -11,7 +11,7 @@ use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
 /**
  * Repository for OAuth2 refresh tokens
  */
-final class RefreshTokenRepository implements RefreshTokenRepositoryInterface
+final class RefreshTokenRepository extends AbstractRepository implements RefreshTokenRepositoryInterface
 {
     /**
      * @inheritDoc

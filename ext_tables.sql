@@ -7,11 +7,9 @@ CREATE TABLE tx_oauth2server_client (
 );
 
 CREATE TABLE tx_oauth2server_accesstoken (
-    identifier  varchar(255) DEFAULT ''                    NOT NULL,
-    revoked     datetime     DEFAULT NULL,
-    client_id   varchar(32)  DEFAULT ''                    NOT NULL,
+    identifier  varchar(255) DEFAULT '' NOT NULL,
+    scopes      varchar(255) DEFAULT '' NOT NULL,
+    client_id   varchar(32)  DEFAULT '' NOT NULL,
     expiry_date datetime     DEFAULT NULL,
-    scopes      varchar(255) DEFAULT ''                    NOT NULL,
-
-    PRIMARY KEY (identifier)
+    revoked     datetime     DEFAULT NULL
 );

@@ -13,7 +13,7 @@ use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
 /**
  * Repository for OAuth2 access tokens
  */
-final class AccessTokenRepository implements AccessTokenRepositoryInterface
+final class AccessTokenRepository extends AbstractRepository implements AccessTokenRepositoryInterface
 {
     /**
      * @inheritDoc
@@ -41,6 +41,8 @@ final class AccessTokenRepository implements AccessTokenRepositoryInterface
     public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity): void
     {
         // TODO: Persist token to the datbase or similar for audit logging or revocation
+        // TODO: move Entities to Models for model -> repo relation
+        $this->add($accessTokenEntity);
     }
 
     /**

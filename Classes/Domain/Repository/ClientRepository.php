@@ -20,7 +20,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
  *
  * @phpstan-type TClientRow array{uid: int, identifier: string, name: string, secret: string, redirect_uris: string, description: string}
  */
-final class ClientRepository implements ClientRepositoryInterface, LoggerAwareInterface
+final class ClientRepository extends AbstractRepository implements ClientRepositoryInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
