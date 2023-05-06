@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace FGTCLB\OAuth2Server\Domain\Repository;
 
 use Doctrine\DBAL\Result;
-use FGTCLB\OAuth2Server\Domain\Entity\Client;
+use FGTCLB\OAuth2Server\Domain\Model\Client;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;

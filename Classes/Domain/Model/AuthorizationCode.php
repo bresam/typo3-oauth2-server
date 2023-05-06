@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace FGTCLB\OAuth2Server\Domain\Entity;
+namespace FGTCLB\OAuth2Server\Domain\Model;
 
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Entities\Traits\AuthCodeTrait;

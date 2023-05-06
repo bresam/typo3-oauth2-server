@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace FGTCLB\OAuth2Server\Domain\Repository;
 
-use FGTCLB\OAuth2Server\Domain\Entity\Scope;
+use FGTCLB\OAuth2Server\Domain\Model\Scope;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
