@@ -39,8 +39,6 @@ final class AccessTokenRepository extends AbstractRepository implements AccessTo
      */
     public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity): void
     {
-        // TODO: Persist token to the datbase or similar for audit logging or revocation
-        // TODO: move Entities to Models for model -> repo relation
         $this->add($accessTokenEntity);
         $this->persistenceManager->persistAll();
     }
