@@ -1,9 +1,11 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace FGTCLB\OAuth2Server\Middleware;
 
 use FGTCLB\OAuth2Server\Configuration;
+use FGTCLB\OAuth2Server\Domain\Model\Client;
 use FGTCLB\OAuth2Server\Domain\Model\User;
 use FGTCLB\OAuth2Server\Server\ServerFactory;
 use FGTCLB\OAuth2Server\Session\UserSession;
@@ -18,6 +20,7 @@ use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Routing\RouterInterface;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
@@ -35,6 +38,7 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
 {
     use LoggerAwareTrait;
 
+    private const REDIRECT_COOKIE_NAME = 'X-REDIRECT';
     protected SiteFinder $siteFinder;
     protected Context $context;
     protected Configuration $configuration;
@@ -52,15 +56,31 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        // redirect to auth after native login loop
+        if (
+            array_key_exists(self::REDIRECT_COOKIE_NAME, ($cookies = $request->getCookieParams())) &&
+            $request->getMethod() === 'POST' &&
+            $request->getAttribute('frontend.user')->user &&
+            $request->getUri()->getPath() === $this->siteFinder
+                ->getSiteByPageId($this->configuration->getLoginPage())
+                ->getRouter($this->context)
+                ->generateUri($this->configuration->getLoginPage())->getPath()
+        ) {
+            return new RedirectResponse($cookies[self::REDIRECT_COOKIE_NAME], 302, [
+                'Set-Cookie' => self::REDIRECT_COOKIE_NAME . '=""; path=/; Expires=' . (time() - 3600)
+            ]);
+        }
+
+        // ignore if not related to oauth path
         if ($request->getUri()->getPath() !== '/oauth/authorize') {
             return $handler->handle($request);
         }
 
+        // proceed with oauth
         $factory = new ServerFactory();
         $server = $factory->buildAuthorizationServer();
 
         $frontendUser = $request->getAttribute('frontend.user');
-
         if (!$frontendUser instanceof FrontendUserAuthentication) {
             $this->logger->warning('No frontend user logged in. Cannot continue with OAuth2 Authorization request.');
             return $handler->handle($request);
@@ -77,24 +97,20 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
             } catch (OAuthServerException $e) {
                 $this->logger->warning(sprintf('Validating authorization request failed: %s', $e->getMessage()));
 
-                $redirectUri = $router->generateUri($this->configuration->getLoginPage());
-
-                return new RedirectResponse($redirectUri);
+                return $this->generateLoginRedirectResponse($request, $router);
             }
         }
 
         if (!$this->context->getPropertyFromAspect('frontend.user', 'isLoggedIn', false)) {
             $userSession->setData('oauth2.authorizationRequest', serialize($authorizationRequest));
 
-            $redirectUri = $router->generateUri($this->configuration->getLoginPage(), ['redirect_url' => $request->getUri()->getPath()]);
-
-            return new RedirectResponse($redirectUri);
+            return $this->generateLoginRedirectResponse($request, $router);
         }
 
         // With TYPO3 11.5.17 it takes 3 loops to unserialize the AuthorizationRequest
         $count = 0;
         while (!$authorizationRequest instanceof AuthorizationRequest && $count < 10) {
-            $authorizationRequest = unserialize($authorizationRequest, ['allowed_classes' => ['League\OAuth2\Server\RequestTypes\AuthorizationRequest', 'FGTCLB\OAuth2Server\Domain\Model\Client']]);
+            $authorizationRequest = unserialize($authorizationRequest, ['allowed_classes' => [AuthorizationRequest::class, Client::class]]);
             $count++;
         }
 
@@ -117,5 +133,15 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
         } catch (OAuthServerException $e) {
             return $e->generateHttpResponse(new Response());
         }
+    }
+
+    private function generateLoginRedirectResponse(ServerRequestInterface $request, RouterInterface $router): RedirectResponse
+    {
+        $redirectUri = $router->generateUri($this->configuration->getLoginPage());
+        $referer = $request->getUri()->getPath() . '?' . $request->getUri()->getQuery();
+
+        return new RedirectResponse($redirectUri, 302, [
+            'Set-Cookie' => self::REDIRECT_COOKIE_NAME . '=' . $referer . '; path=/; Expires=' . (time() + 300)
+        ]);
     }
 }
