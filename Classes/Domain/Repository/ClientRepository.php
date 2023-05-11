@@ -24,7 +24,7 @@ final class ClientRepository extends AbstractRepository implements ClientReposit
 {
     use LoggerAwareTrait;
 
-    private const TABLE_NAME = 'tx_oauth2server_client';
+    private const TABLE_NAME = 'tx_oauth2server_domain_model_client';
     private PasswordHashFactory $hashFactory;
     private Connection $databaseConnection;
 
