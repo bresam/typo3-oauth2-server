@@ -38,7 +38,8 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
 {
     use LoggerAwareTrait;
 
-    private const REDIRECT_COOKIE_NAME = 'X-REDIRECT';
+    public const REDIRECT_COOKIE_NAME = 'x-oauth-login-redirect';
+
     protected SiteFinder $siteFinder;
     protected Context $context;
     protected Configuration $configuration;
@@ -67,7 +68,7 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
                 ->generateUri($this->configuration->getLoginPage())->getPath()
         ) {
             return new RedirectResponse($cookies[self::REDIRECT_COOKIE_NAME], 302, [
-                'Set-Cookie' => self::REDIRECT_COOKIE_NAME . '=""; path=/; Expires=' . (time() - 3600)
+                'Set-Cookie' => sprintf('%s=; path=/; Max-Age=0', self::REDIRECT_COOKIE_NAME, $referer)
             ]);
         }
 
@@ -141,7 +142,7 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
         $referer = $request->getUri()->getPath() . '?' . $request->getUri()->getQuery();
 
         return new RedirectResponse($redirectUri, 302, [
-            'Set-Cookie' => self::REDIRECT_COOKIE_NAME . '=' . $referer . '; path=/; Expires=' . (time() + 300)
+            'Set-Cookie' => sprintf('%s=%s; path=/; Max-Age=300', self::REDIRECT_COOKIE_NAME, $referer)
         ]);
     }
 }

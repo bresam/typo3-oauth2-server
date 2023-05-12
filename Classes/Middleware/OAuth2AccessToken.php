@@ -7,6 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Http\Response;
 
 /**
@@ -16,6 +17,13 @@ use TYPO3\CMS\Core\Http\Response;
  */
 final class OAuth2AccessToken implements MiddlewareInterface
 {
+    private LoggerInterface $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * Process an incoming server request and return a response, optionally delegating
      * response creation to a handler.
@@ -30,8 +38,27 @@ final class OAuth2AccessToken implements MiddlewareInterface
         $server = $factory->buildAuthorizationServer();
 
         try {
+            $this->logger->warning('AccessTokenRequest', [
+                'attributes' => $request->getAttributes(),
+                'uri' => $request->getUri(),
+                'cookies' => $request->getCookieParams(),
+                'body' => $request->getBody(),
+                'query' => $request->getQueryParams(),
+                'headers' => $request->getHeaders(),
+            ]);
+
             return $server->respondToAccessTokenRequest($request, new Response());
         } catch (OAuthServerException $exception) {
+            $this->logger->error('AccessTokenException', [
+                'msg' => $exception->getMessage(),
+                'attributes' => $request->getAttributes(),
+                'uri' => $request->getUri(),
+                'cookies' => $request->getCookieParams(),
+                'body' => $request->getBody(),
+                'query' => $request->getQueryParams(),
+                'headers' => $request->getHeaders(),
+            ]);
+
             return $exception->generateHttpResponse(new Response());
         }
     }
