@@ -1,4 +1,7 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types = 1);
+
 namespace FGTCLB\OAuth2Server\Middleware;
 
 use FGTCLB\OAuth2Server\Server\ServerFactory;
@@ -7,7 +10,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Http\Response;
 
 /**
@@ -17,11 +19,11 @@ use TYPO3\CMS\Core\Http\Response;
  */
 final class OAuth2AccessToken implements MiddlewareInterface
 {
-    private LoggerInterface $logger;
+    private ServerFactory $serverFactory;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(ServerFactory $serverFactory)
     {
-        $this->logger = $logger;
+        $this->serverFactory = $serverFactory;
     }
 
     /**
@@ -34,31 +36,11 @@ final class OAuth2AccessToken implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $factory = new ServerFactory();
-        $server = $factory->buildAuthorizationServer();
-
         try {
-            $this->logger->warning('AccessTokenRequest', [
-                'attributes' => $request->getAttributes(),
-                'uri' => $request->getUri(),
-                'cookies' => $request->getCookieParams(),
-                'body' => $request->getBody(),
-                'query' => $request->getQueryParams(),
-                'headers' => $request->getHeaders(),
-            ]);
-
-            return $server->respondToAccessTokenRequest($request, new Response());
+            return $this->serverFactory
+                ->buildAuthorizationServer()
+                ->respondToAccessTokenRequest($request, new Response());
         } catch (OAuthServerException $exception) {
-            $this->logger->error('AccessTokenException', [
-                'msg' => $exception->getMessage(),
-                'attributes' => $request->getAttributes(),
-                'uri' => $request->getUri(),
-                'cookies' => $request->getCookieParams(),
-                'body' => $request->getBody(),
-                'query' => $request->getQueryParams(),
-                'headers' => $request->getHeaders(),
-            ]);
-
             return $exception->generateHttpResponse(new Response());
         }
     }

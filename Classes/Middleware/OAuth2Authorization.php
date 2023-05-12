@@ -43,12 +43,18 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
     protected SiteFinder $siteFinder;
     protected Context $context;
     protected Configuration $configuration;
+    protected ServerFactory $serverFactory;
 
-    public function __construct(Configuration $configuration, Context $context, SiteFinder $siteFinder)
-    {
+    public function __construct(
+        Configuration $configuration,
+        Context $context,
+        SiteFinder $siteFinder,
+        ServerFactory $serverFactory
+    ) {
         $this->configuration = $configuration;
         $this->context = $context;
         $this->siteFinder = $siteFinder;
+        $this->serverFactory = $serverFactory;
     }
 
     /**
@@ -68,7 +74,7 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
                 ->generateUri($this->configuration->getLoginPage())->getPath()
         ) {
             return new RedirectResponse($cookies[self::REDIRECT_COOKIE_NAME], 302, [
-                'Set-Cookie' => sprintf('%s=; path=/; Max-Age=0', self::REDIRECT_COOKIE_NAME, $referer)
+                'Set-Cookie' => sprintf('%s=; path=/; Max-Age=0', self::REDIRECT_COOKIE_NAME)
             ]);
         }
 
@@ -78,8 +84,7 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
         }
 
         // proceed with oauth
-        $factory = new ServerFactory();
-        $server = $factory->buildAuthorizationServer();
+        $server = $this->serverFactory->buildAuthorizationServer();
 
         $frontendUser = $request->getAttribute('frontend.user');
         if (!$frontendUser instanceof FrontendUserAuthentication) {

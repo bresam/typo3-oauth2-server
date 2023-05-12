@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace FGTCLB\OAuth2Server\Domain\Repository;
@@ -9,8 +10,6 @@ use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 
 /**
  * Repository for OAuth2 clients.
@@ -24,14 +23,11 @@ final class ClientRepository extends AbstractRepository implements ClientReposit
 {
     use LoggerAwareTrait;
 
-    private const TABLE_NAME = 'tx_oauth2server_domain_model_client';
     private PasswordHashFactory $hashFactory;
-    private Connection $databaseConnection;
 
-    public function __construct(PasswordHashFactory $hashFactory, ConnectionPool $connectionPool)
+    public function injectPasswordHashFactory(PasswordHashFactory $hashFactory): void
     {
         $this->hashFactory = $hashFactory;
-        $this->databaseConnection = $connectionPool->getConnectionForTable(self::TABLE_NAME);
     }
 
     /**
@@ -39,12 +35,12 @@ final class ClientRepository extends AbstractRepository implements ClientReposit
      */
     public function getClientEntity($clientIdentifier): ?Client
     {
-        $clientData = $this->findRawByIdentifier($clientIdentifier);
-        if (!$clientData) {
-            return null;
-        }
+        $query = $this->createQuery();
+        $query->matching($query->equals('identifier', 'lms'));
 
-        return Client::fromDatabaseRow($clientData);
+        $client = $query->execute(true)[0];
+
+        return $client ? Client::fromDatabaseRow($client) : null;
     }
 
     /**
@@ -52,6 +48,11 @@ final class ClientRepository extends AbstractRepository implements ClientReposit
      */
     protected function findRawByIdentifier(string $clientIdentifier): ?array
     {
+        $query = $this->createQuery();
+
+        $query->equals('identifier', $clientIdentifier);
+        $query->execute(true);
+
         $queryBuilder = $this->databaseConnection
             ->createQueryBuilder();
         /** @var Result $result select() always yields a Result instance and not an int */

@@ -1,4 +1,7 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types = 1);
+
 namespace FGTCLB\OAuth2Server\Middleware;
 
 use FGTCLB\OAuth2Server\Server\ServerFactory;
@@ -27,7 +30,7 @@ final class OAuth2Identity implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if ($request->getUri()->getPath() === '/oauth/identity') {
-            $factory = new ServerFactory();
+            $factory = GeneralUtility::makeInstance(ServerFactory::class);
             $server = $factory->buildResourceServer();
 
             try {
