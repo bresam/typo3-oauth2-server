@@ -1,11 +1,11 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace FGTCLB\OAuth2Server\Domain\Model;
 
 use FGTCLB\OAuth2Server\Domain\Repository\ClientRepository;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
-use League\OAuth2\Server\Entities\Traits\ClientTrait;
 use League\OAuth2\Server\Entities\Traits\EntityTrait;
 use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -19,32 +19,41 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 final class Client extends AbstractEntity implements ClientEntityInterface
 {
     use EntityTrait;
-    use ClientTrait;
 
-    private string $secret;
+    /** @var string */
+    protected $secret = null;
 
-    private function __construct(string $identifier, string $name, string $redirectUri, string $secret, bool $isConfidential)
+    /** @var string */
+    protected $name;
+
+    /** @var string */
+    protected $redirectUris = '';
+
+    /** @var bool */
+    protected $isConfidential = true;
+
+    /**
+     * Get the client's name.
+     */
+    public function getName(): ?string
     {
-        $this->identifier = $identifier;
-        $this->name = $name;
-        $this->redirectUri = GeneralUtility::trimExplode("\n", $redirectUri);
-        $this->secret = $secret;
-        $this->isConfidential = $isConfidential;
+        return $this->name;
     }
 
     /**
-     * @param TClientRow $row
+     * Return an indexed array of redirect URIs.
+     *
+     * @return string[]
      */
-    public static function fromDatabaseRow(array $row): self
+    public function getRedirectUri(): array
     {
-        return new self(
-            $row['identifier'],
-            $row['name'],
-            $row['redirect_uris'],
-            $row['secret'],
-            // TODO make this configurable once we support OAuth2 e.g. in a browser, where the client secret cannot be kept secret
-            true
-        );
+        return $this->redirectUris ? GeneralUtility::trimExplode("\n", $this->redirectUris) : [];
+    }
+
+    /** Returns true if the client is confidential.*/
+    public function isConfidential(): bool
+    {
+        return $this->isConfidential;
     }
 
     public function validateSecret(string $secret, PasswordHashFactory $hashFactory): bool

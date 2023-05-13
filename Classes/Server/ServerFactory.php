@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace FGTCLB\OAuth2Server\Server;
@@ -12,6 +13,7 @@ use FGTCLB\OAuth2Server\Domain\Repository\ScopeRepository;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\AuthorizationValidators\BearerTokenValidator;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
+use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use League\OAuth2\Server\ResourceServer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -48,16 +50,21 @@ final class ServerFactory
             $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey']
         );
 
-        $authorizationCodeRepository = new AuthorizationCodeRepository();
-        $refreshTokenRepository = new RefreshTokenRepository();
-        $grant = new AuthCodeGrant(
-            $authorizationCodeRepository,
-            $refreshTokenRepository,
+        $authCodeGrant = new AuthCodeGrant(
+            new AuthorizationCodeRepository(),
+            GeneralUtility::makeInstance(RefreshTokenRepository::class),
             $this->configuration->getAuthorizationCodeLifetime()
         );
-        $grant->setRefreshTokenTTL($this->configuration->getRefreshTokenLifetime());
-        // Enable the authentication code grant on the server
-        $server->enableGrantType($grant, $this->configuration->getAccessTokenLifetime());
+        $authCodeGrant->setRefreshTokenTTL($this->configuration->getRefreshTokenLifetime());
+
+        $refreshTokenGrant = new RefreshTokenGrant(
+            GeneralUtility::makeInstance(RefreshTokenRepository::class),
+        );
+        $refreshTokenGrant->setRefreshTokenTTL($this->configuration->getRefreshTokenLifetime());
+
+        // Enable grants
+        $server->enableGrantType($authCodeGrant, $this->configuration->getAccessTokenLifetime());
+        $server->enableGrantType($refreshTokenGrant, $this->configuration->getAccessTokenLifetime());
 
         return $server;
     }
@@ -69,7 +76,7 @@ final class ServerFactory
      */
     public function buildResourceServer(): ResourceServer
     {
-        $accessTokenRepository = new AccessTokenRepository();
+        $accessTokenRepository = GeneralUtility::makeInstance(AccessTokenRepository::class);
         $validator = new BearerTokenValidator(
             $accessTokenRepository
         );

@@ -38,27 +38,8 @@ final class OAuth2AccessToken implements MiddlewareInterface
         $server = $factory->buildAuthorizationServer();
 
         try {
-            $this->logger->warning('AccessTokenRequest', [
-                'attributes' => $request->getAttributes(),
-                'uri' => $request->getUri(),
-                'cookies' => $request->getCookieParams(),
-                'body' => $request->getBody(),
-                'query' => $request->getQueryParams(),
-                'headers' => $request->getHeaders(),
-            ]);
-
             return $server->respondToAccessTokenRequest($request, new Response());
         } catch (OAuthServerException $exception) {
-            $this->logger->error('AccessTokenException', [
-                'msg' => $exception->getMessage(),
-                'attributes' => $request->getAttributes(),
-                'uri' => $request->getUri(),
-                'cookies' => $request->getCookieParams(),
-                'body' => $request->getBody(),
-                'query' => $request->getQueryParams(),
-                'headers' => $request->getHeaders(),
-            ]);
-
             return $exception->generateHttpResponse(new Response());
         }
     }

@@ -28,6 +28,15 @@ return [
                 'eval' => 'trim,required',
             ]
         ],
+        'user_identifier' => [
+            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.user.label',
+            'config' => [
+                'type' => 'input',
+                'size' => 32,
+                'max' => 255,
+                'eval' => 'trim',
+            ]
+        ],
         'scopes' => [
             'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.scopes.label',
             'config' => [
@@ -37,16 +46,16 @@ return [
                 'eval' => 'trim',
             ]
         ],
-        'client_id' => [
-            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.client_id.label',
+        'client' => [
+            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.client.label',
             'config' => [
-                'type' => 'input',
-                'size' => 32,
-                'max' => 100,
-                'eval' => 'trim,required'
-            ]
+                'type' => 'inline',
+                'foreign_table' => 'tx_oauth2server_domain_model_client',
+                'maxitems' => 1,
+                'minitems' => 1,
+            ],
         ],
-        'expiry_date' => [
+        'expiry_date_time' => [
             'exclude' => false,
             'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.expiry_date.label',
             'config' => [

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace FGTCLB\OAuth2Server\Domain\Repository;
@@ -25,7 +26,8 @@ final class RefreshTokenRepository extends AbstractRepository implements Refresh
      */
     public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity): void
     {
-        // TODO: Persist token to the datbase or similar for audit logging or revocation
+        $this->add($refreshTokenEntity);
+        $this->persistenceManager->persistAll();
     }
 
     /**

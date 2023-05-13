@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file original="" source-language="en" datatype="plaintext">
+		<body>
+			<trans-unit id="refreshtoken.title">
+				<source>OAuth2 Refresh Token</source>
+			</trans-unit>
+			<trans-unit id="refreshtoken.identifier.label">
+				<source>Identifier</source>
+			</trans-unit>
+			<trans-unit id="refreshtoken.access_token.label">
+				<source>Access Token</source>
+			</trans-unit>
+			<trans-unit id="refreshtoken.expiry_date_time.label">
+				<source>Expiry Date</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

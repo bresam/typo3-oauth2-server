@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace FGTCLB\OAuth2Server\Domain\Repository;
@@ -17,7 +18,7 @@ final class AccessTokenRepository extends AbstractRepository implements AccessTo
     /**
      * @inheritDoc
      */
-    public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null)
+    public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null): AccessTokenEntityInterface
     {
         $accessToken = new AccessToken();
         $accessToken->setClient($clientEntity);
@@ -50,7 +51,15 @@ final class AccessTokenRepository extends AbstractRepository implements AccessTo
      */
     public function revokeAccessToken($tokenId): void
     {
-        // TODO: Revoke persisted token
+        $accessToken = $this->getAccessTokenByIdentifier($tokenId);
+
+        if (!$accessToken) {
+            return;
+        }
+
+        $accessToken->setRevoked(new \DateTimeImmutable());
+        $this->update($accessToken);
+        $this->persistenceManager->persistAll();
     }
 
     /**
@@ -60,9 +69,26 @@ final class AccessTokenRepository extends AbstractRepository implements AccessTo
      *
      * @return bool Return true if this token has been revoked
      */
-    public function isAccessTokenRevoked($tokenId)
+    public function isAccessTokenRevoked($tokenId): bool
     {
-        // TODO: Check if persisted token is revoked
-        return false;
+        $accessToken = $this->getAccessTokenByIdentifier($tokenId);
+
+        if (!$accessToken) {
+            return true;
+        }
+
+        return (bool) $accessToken->getRevoked();
+    }
+
+    private function getAccessTokenByIdentifier(string $identifier): ?AccessToken
+    {
+        $query = $this->createQuery();
+        $query->matching(
+            $query->logicalAnd(
+                $query->equals('identifier', $identifier)
+            )
+        );
+
+        return $query->execute()->getFirst();
     }
 }

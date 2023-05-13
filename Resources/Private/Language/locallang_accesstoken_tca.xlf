@@ -3,16 +3,19 @@
 	<file original="" source-language="en" datatype="plaintext">
 		<body>
 			<trans-unit id="accesstoken.title">
-				<source>OAuth2 AccessToken</source>
+				<source>OAuth2 Access Token</source>
 			</trans-unit>
 			<trans-unit id="accesstoken.identifier.label">
 				<source>Identifier</source>
 			</trans-unit>
+			<trans-unit id="accesstoken.user.label">
+				<source>User Identifier</source>
+			</trans-unit>
 			<trans-unit id="accesstoken.scopes.label">
 				<source>Scopes</source>
 			</trans-unit>
-			<trans-unit id="accesstoken.client_id.label">
-				<source>Client ID</source>
+			<trans-unit id="accesstoken.client.label">
+				<source>Client</source>
 			</trans-unit>
 			<trans-unit id="accesstoken.expiry_date.label">
 				<source>Expiry Date</source>

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace FGTCLB\OAuth2Server\Domain\Repository;
