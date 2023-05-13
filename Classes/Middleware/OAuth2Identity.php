@@ -45,17 +45,20 @@ final class OAuth2Identity implements MiddlewareInterface
     private function generateIdentityResponse(RequestInterface $request): JsonResponse
     {
         $userId = $request->getAttribute('oauth_user_id');
+        $clientId = $request->getAttribute('oauth_client_id');
 
         $qb = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable('fe_users')
             ->createQueryBuilder();
 
         $userData = $qb
-            ->select('uid', 'username', 'name', 'first_name', 'middle_name', 'last_name', 'email')
+            ->select('uid as identifier', 'username', 'name', 'first_name', 'middle_name', 'last_name', 'email')
             ->from('fe_users')
             ->where($qb->expr()->eq('uid', $qb->createNamedParameter($userId)))
             ->executeQuery()
             ->fetchAssociative();
+
+        $userData['client_id'] = $clientId;
 
         return new JsonResponse($userData);
     }
