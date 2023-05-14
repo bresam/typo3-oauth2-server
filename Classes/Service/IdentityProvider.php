@@ -27,6 +27,8 @@ final class IdentityProvider implements IdentityProviderInterface
         $userData = $this->getUserData($identifier);
 
         // map profile properties to oidc specs
+        if (!$userData['name']) { unset($userData['name']); }
+        if (!$userData['middle_name']) { unset($userData['middle_name']); }
         if ($userData['lastname']) { $userData['family_name'] = $userData['lastname']; }
         if ($userData['firstname']) { $userData['given_name'] = $userData['firstname']; }
         if ($userData['username']) { $userData['preferred_username'] = $userData['username']; }
@@ -66,7 +68,7 @@ final class IdentityProvider implements IdentityProviderInterface
 
     private function getProfileImageUri(array $userData): ?string
     {
-        $fileReference = $this->fileRepository->findByRelation('fe_users', 'image', $userData['image']);
+        $fileReference = $this->fileRepository->findByRelation('fe_users', 'image', (int) $userData['image']);
 
         if (!$fileReference[0]) {
             if ($userData['email']) {
