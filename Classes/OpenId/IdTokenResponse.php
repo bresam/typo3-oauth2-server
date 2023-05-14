@@ -41,16 +41,13 @@ class IdTokenResponse extends BearerTokenResponse
         }
 
         // Add required id_token claims
-        $builder
+        return $builder
             ->permittedFor($accessToken->getClient()->getIdentifier())
             ->issuedBy('https://' . $_SERVER['HTTP_HOST'])
             ->issuedAt(new \DateTimeImmutable())
             ->expiresAt($expiresAt)
-            ->relatedTo($userEntity->getIdentifier());
-
-        $builder->withClaim('auth_time', $userEntity->getClaims()['lastlogin']);
-
-        return $builder;
+            ->relatedTo($userEntity->getIdentifier())
+            ->withClaim('auth_time', $userEntity->getClaims()['lastlogin']);
     }
 
     protected function getExtraParams(AccessTokenEntityInterface $accessToken): array
