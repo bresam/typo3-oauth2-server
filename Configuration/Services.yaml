@@ -8,8 +8,16 @@ services:
     resource: '../Classes/*'
     exclude:
       - '../Classes/Domain/Model/*'
+      - '../Classes/Domain/DTO/*'
       - '../Classes/Domain/Repository/*'
+      - '../Classes/OpenId/*'
 
+  #Repositories
   FGTCLB\OAuth2Server\Domain\Repository\:
     resource: '../Classes/Domain/Repository/*'
+    public: true
+
+  # Services
+  FGTCLB\OAuth2Server\Service\:
+    resource: '../Classes/Service/*'
     public: true

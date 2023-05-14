@@ -10,6 +10,9 @@ use FGTCLB\OAuth2Server\Domain\Repository\AuthorizationCodeRepository;
 use FGTCLB\OAuth2Server\Domain\Repository\ClientRepository;
 use FGTCLB\OAuth2Server\Domain\Repository\RefreshTokenRepository;
 use FGTCLB\OAuth2Server\Domain\Repository\ScopeRepository;
+use FGTCLB\OAuth2Server\OpenId\ClaimExtractor;
+use FGTCLB\OAuth2Server\OpenId\IdTokenResponse;
+use FGTCLB\OAuth2Server\Service\IdentityProvider;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\AuthorizationValidators\BearerTokenValidator;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
@@ -47,8 +50,17 @@ final class ServerFactory
             $accessTokenRepository,
             $scopeRepository,
             $this->configuration->getPrivateKeyFile(),
-            $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey']
+            $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey'],
+            new IdTokenResponse(GeneralUtility::makeInstance(IdentityProvider::class), new ClaimExtractor())
         );
+
+//        $idTokenGrant = new OpenIdConnectGrant(
+//            new AuthorizationCodeRepository(),
+//            GeneralUtility::makeInstance(RefreshTokenRepository::class),
+//            GeneralUtility::makeInstance(IdentityProvider::class),
+//            $this->configuration->getAuthorizationCodeLifetime()
+//        );
+//        $idTokenGrant->setRefreshTokenTTL($this->configuration->getRefreshTokenLifetime());
 
         $authCodeGrant = new AuthCodeGrant(
             new AuthorizationCodeRepository(),
@@ -63,6 +75,7 @@ final class ServerFactory
         $refreshTokenGrant->setRefreshTokenTTL($this->configuration->getRefreshTokenLifetime());
 
         // Enable grants
+//        $server->enableGrantType($idTokenGrant, $this->configuration->getAccessTokenLifetime());
         $server->enableGrantType($authCodeGrant, $this->configuration->getAccessTokenLifetime());
         $server->enableGrantType($refreshTokenGrant, $this->configuration->getAccessTokenLifetime());
 

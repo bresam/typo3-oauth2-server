@@ -6,6 +6,7 @@ namespace FGTCLB\OAuth2Server\Middleware;
 
 use FGTCLB\OAuth2Server\Configuration;
 use FGTCLB\OAuth2Server\Domain\Model\Client;
+use FGTCLB\OAuth2Server\Domain\Model\Scope;
 use FGTCLB\OAuth2Server\Domain\Model\User;
 use FGTCLB\OAuth2Server\Server\ServerFactory;
 use FGTCLB\OAuth2Server\Session\UserSession;
@@ -111,7 +112,7 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
         // With TYPO3 11.5.17 it takes 3 loops to unserialize the AuthorizationRequest
         $count = 0;
         while (!$authorizationRequest instanceof AuthorizationRequest && $count < 10) {
-            $authorizationRequest = unserialize($authorizationRequest, ['allowed_classes' => [AuthorizationRequest::class, Client::class]]);
+            $authorizationRequest = unserialize($authorizationRequest, ['allowed_classes' => [AuthorizationRequest::class, Client::class, Scope::class]]);
             $count++;
         }
 
