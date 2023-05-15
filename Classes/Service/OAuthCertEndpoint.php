@@ -31,7 +31,7 @@ class OAuthCertEndpoint implements OAuthApiEndpointInterface
 
     public function canHandlePath(string $path): bool
     {
-        return $path === '/oauth/jwks.json';
+        return $path === '/connect/jwks.json';
     }
 
     public function handle(RequestInterface $request): ResponseInterface
@@ -48,6 +48,6 @@ class OAuthCertEndpoint implements OAuthApiEndpointInterface
             ],
         ];
 
-        return new JsonResponse($jsonData);
+        return new JsonResponse($jsonData, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 }

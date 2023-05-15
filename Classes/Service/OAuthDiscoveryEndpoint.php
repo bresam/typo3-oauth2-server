@@ -36,7 +36,7 @@ class OAuthDiscoveryEndpoint implements OAuthApiEndpointInterface
             "token_endpoint" => sprintf('%s://%s/oauth/token', $requestScheme, $_SERVER['HTTP_HOST']),
             "userinfo_endpoint" => sprintf('%s://%s/connect/userinfo', $requestScheme, $_SERVER['HTTP_HOST']),
             "jwks_uri" => sprintf('%s://%s/connect/jwks.json', $requestScheme, $_SERVER['HTTP_HOST']),
-            "registration_endpoint" => sprintf('%s://%s/connect/register', $requestScheme, $_SERVER['HTTP_HOST']),
+//            "registration_endpoint" => sprintf('%s://%s/connect/register', $requestScheme, $_SERVER['HTTP_HOST']),
             "scopes_supported" => ["openid", "profile", "email", "address", "phone"],
             "response_types_supported" => ["code", "code id_token", "id_token", "token id_token"],
             "response_modes_supported" => ["query", "fragment"],
@@ -65,6 +65,6 @@ class OAuthDiscoveryEndpoint implements OAuthApiEndpointInterface
 //            "claims_parameter_supported" => true,
 //            "service_documentation" => "http://server.example.com/connect/service_documentation.html",
 //            "ui_locales_supported" => ["en-US", "en-GB", "en-CA", "fr-FR", "fr-CA"]
-        ]);
+        ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 }
