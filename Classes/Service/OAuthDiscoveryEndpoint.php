@@ -28,7 +28,7 @@ class OAuthDiscoveryEndpoint implements OAuthApiEndpointInterface
 
     public function handle(RequestInterface $request): ResponseInterface
     {
-        $requestScheme = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? $_SERVER['REQUEST_SCHEME'];
+        $requestScheme = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? 'https';
 
         return new JsonResponse([
             "issuer" => sprintf('%s://%s', $requestScheme, $_SERVER['HTTP_HOST']),
