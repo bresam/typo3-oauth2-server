@@ -8,9 +8,10 @@ services:
     resource: '../Classes/*'
     exclude:
       - '../Classes/Domain/Model/*'
-      - '../Classes/Domain/DTO/*'
       - '../Classes/Domain/Repository/*'
-      - '../Classes/OpenId/*'
+      - '../Classes/DTO/*'
+      - '../Classes/Service/*'
+      - '../Classes/DependencyInjection/*'
 
   #Repositories
   FGTCLB\OAuth2Server\Domain\Repository\:

@@ -81,7 +81,7 @@ final class IdentityProvider implements IdentityProviderInterface
 
         return sprintf(
             '%s://%s/%s',
-            $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? 'https',
+            $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? $_SERVER['REQUEST_SCHEME'],
             $_SERVER['HTTP_HOST'],
             $fileReference[0]->getPublicUrl()
         );

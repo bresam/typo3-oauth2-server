@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use FGTCLB\OAuth2Server\Middleware\OAuth2AccessToken;
+use FGTCLB\OAuth2Server\Middleware\OAuth2ApiEndpoints;
 use FGTCLB\OAuth2Server\Middleware\OAuth2Authorization;
 
 return [
@@ -21,6 +22,15 @@ return [
             'target' => OAuth2AccessToken::class,
             'after' => [
                 'typo3/cms-frontend/maintenance-mode',
+            ],
+            'before' => [
+                'typo3/cms-frontend/static-route-resolver',
+            ],
+        ],
+        'fgtclb/typo3-oauth-server/identity' => [
+            'target' => OAuth2ApiEndpoints::class,
+            'after' => [
+                'typo3/cms-frontend/authentication',
             ],
             'before' => [
                 'typo3/cms-frontend/static-route-resolver',
