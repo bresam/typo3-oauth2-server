@@ -13,12 +13,27 @@ use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
  */
 final class AuthorizationCodeRepository extends AbstractRepository implements AuthCodeRepositoryInterface
 {
+    public function getAuthCodeByIdentifier(string $identifier): ?AuthorizationCode
+    {
+        $query = $this->createQuery();
+        $query->matching(
+            $query->logicalAnd(
+                $query->equals('identifier', $identifier)
+            )
+        );
+
+        return $query->execute()->getFirst();
+    }
+
     /**
      * @inheritDoc
      */
     public function getNewAuthCode()
     {
-        return new AuthorizationCode();
+        $authCode = new AuthorizationCode();
+        $authCode->setNonce($_REQUEST['nonce'] ?? null);
+
+        return $authCode;
     }
 
     /**
@@ -26,7 +41,8 @@ final class AuthorizationCodeRepository extends AbstractRepository implements Au
      */
     public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity): void
     {
-        // TODO: Persist code to the datbase or similar for audit logging or revocation
+        $this->add($authCodeEntity);
+        $this->persistenceManager->persistAll();
     }
 
     /**
@@ -34,15 +50,15 @@ final class AuthorizationCodeRepository extends AbstractRepository implements Au
      */
     public function revokeAuthCode($codeId): void
     {
-        // TODO: Revoke persisted code
+        $this->remove($this->getAuthCodeByIdentifier($codeId));
+        $this->persistenceManager->persistAll();
     }
 
     /**
      * @inheritDoc
      */
-    public function isAuthCodeRevoked($codeId)
+    public function isAuthCodeRevoked($codeId): bool
     {
-        // TODO: Check if persisted code is revoked
-        return false;
+        return ! $this->getAuthCodeByIdentifier($codeId);
     }
 }

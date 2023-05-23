@@ -42,6 +42,16 @@ final class OAuth2ApiEndpoints implements MiddlewareInterface
 
                 try {
                     $request = $server->validateAuthenticatedRequest($request);
+
+                    // check scope if required
+                    if (($scope = $apiEndpoint->getScope()) !== '*'
+                        && (
+                            !($scopes = $request->getAttribute('oauth_scopes'))
+                            || !in_array($scope, $scopes, true)
+                        )
+                    ) {
+                        throw new OAuthServerException('Scope not allowed', 5, 'invalid_scope', 401);
+                    }
                 } catch (OAuthServerException $e) {
                     return $e->generateHttpResponse(new Response());
                 }

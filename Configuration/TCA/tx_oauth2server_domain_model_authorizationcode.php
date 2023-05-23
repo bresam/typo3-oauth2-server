@@ -4,7 +4,7 @@ return [
     'ctrl' => [
         'label' => 'identifier',
         'tstamp' => 'tstamp',
-        'title' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.title',
+        'title' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_authorizationcode_tca.xlf:authorizationcode.title',
         'crdate' => 'crdate',
         'cruser_id' => 'cruser_id',
         'delete' => 'deleted',
@@ -15,11 +15,11 @@ return [
         'searchFields' => 'identifier'
     ],
     'interface' => [
-        'showRecordFieldList' => 'identifier,scopes,client_id,expiry_date,revoked'
+        'showRecordFieldList' => 'identifier,redirect_uri,user_identifier,scopes,client,expiry_date_time,nonce'
     ],
     'columns' => [
         'identifier' => [
-            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.identifier.label',
+            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_authorizationcode_tca.xlf:authorizationcode.identifier.label',
             'config' => [
                 'type' => 'input',
                 'size' => 32,
@@ -27,8 +27,17 @@ return [
                 'eval' => 'trim,required',
             ]
         ],
+        'redirect_uri' => [
+            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_authorizationcode_tca.xlf:authorizationcode.redirect_uri.label',
+            'config' => [
+                'type' => 'input',
+                'size' => 32,
+                'max' => 255,
+                'eval' => 'trim',
+            ]
+        ],
         'user_identifier' => [
-            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.user.label',
+            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_authorizationcode_tca.xlf:authorizationcode.user_identifier.label',
             'config' => [
                 'type' => 'input',
                 'size' => 32,
@@ -37,7 +46,7 @@ return [
             ]
         ],
         'scopes' => [
-            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.scopes.label',
+            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_authorizationcode_tca.xlf:authorizationcode.scopes.label',
             'config' => [
                 'type' => 'input',
                 'size' => 32,
@@ -46,17 +55,18 @@ return [
             ]
         ],
         'client' => [
-            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.client.label',
+            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_authorizationcode_tca.xlf:authorizationcode.client.label',
             'config' => [
                 'type' => 'inline',
                 'foreign_table' => 'tx_oauth2server_domain_model_client',
                 'maxitems' => 1,
                 'minitems' => 1,
             ],
+            'exclude' => false,
         ],
         'expiry_date_time' => [
             'exclude' => false,
-            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.expiry_date.label',
+            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_authorizationcode_tca.xlf:authorizationcode.expiry_date_time.label',
             'config' => [
                 'type' => 'input',
                 'size' => 16,
@@ -64,15 +74,14 @@ return [
                 'default' => '0',
             ],
         ],
-        'revoked' => [
-            'exclude' => false,
-            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_accesstoken_tca.xlf:accesstoken.revoked.label',
+        'nonce' => [
+            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_authorizationcode_tca.xlf:authorizationcode.nonce.label',
             'config' => [
                 'type' => 'input',
-                'size' => 16,
-                'eval' => 'datetime',
-                'default' => '0',
-            ],
+                'size' => 32,
+                'max' => 255,
+                'eval' => 'trim',
+            ]
         ]
     ],
     'types' => [
@@ -83,6 +92,6 @@ return [
         ']
     ],
     'palettes' => [
-        'details' => ['showitem' => 'identifier, --linebreak--, scopes, --linebreak--, client_id, --linebreak--, expiry_date, --linebreak--, revoked'],
+        'details' => ['showitem' => 'identifier, --linebreak--, redirect_uri, --linebreak--, user_identifier, --linebreak--, scopes, --linebreak--, client, --linebreak--, expiry_date_time --linebreak--, nonce'],
     ],
 ];

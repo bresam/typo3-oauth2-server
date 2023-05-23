@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace FGTCLB\OAuth2Server\Service;
 
 use FGTCLB\OAuth2Server\Configuration;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use FGTCLB\OAuth2Server\DependencyInjection\ApiEndpoint\OAuthApiEndpointInterface;
 use TYPO3\CMS\Core\Http\JsonResponse;
+use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Http\ServerRequest;
 
 class OAuthCertEndpoint implements OAuthApiEndpointInterface
 {
@@ -34,7 +34,7 @@ class OAuthCertEndpoint implements OAuthApiEndpointInterface
         return $path === '/connect/jwks.json';
     }
 
-    public function handle(RequestInterface $request): ResponseInterface
+    public function handle(ServerRequest $request): Response
     {
         $keyInfo = openssl_pkey_get_details(openssl_pkey_get_public(file_get_contents($this->configuration->getPublicKeyFile())));
 

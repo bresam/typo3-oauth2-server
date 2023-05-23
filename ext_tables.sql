@@ -11,7 +11,7 @@ CREATE TABLE tx_oauth2server_domain_model_accesstoken
 (
     identifier       varchar(255) DEFAULT '' NOT NULL,
     user_identifier  varchar(255) DEFAULT NULL,
-    scopes           varchar(255) DEFAULT '' NOT NULL,
+    scopes           varchar(255) DEFAULT NULL,
     client           varchar(32)  DEFAULT '' NOT NULL,
     expiry_date_time int unsigned DEFAULT NULL,
     revoked          int unsigned DEFAULT NULL
@@ -22,4 +22,15 @@ CREATE TABLE tx_oauth2server_domain_model_refreshtoken
     identifier       varchar(255) DEFAULT '' NOT NULL,
     access_token     varchar(255) DEFAULT '' NOT NULL,
     expiry_date_time int unsigned DEFAULT NULL
+);
+
+CREATE TABLE tx_oauth2server_domain_model_authorizationcode
+(
+    identifier       varchar(255) DEFAULT '' NOT NULL,
+    redirect_uri     varchar(255) DEFAULT NULL,
+    user_identifier  varchar(255) DEFAULT NULL,
+    scopes           varchar(255) DEFAULT NULL,
+    client           int unsigned DEFAULT NULL,
+    expiry_date_time int unsigned DEFAULT NULL,
+    nonce            varchar(255) DEFAULT NULL
 );

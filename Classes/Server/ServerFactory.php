@@ -44,14 +44,20 @@ final class ServerFactory
     {
         $clientRepository = GeneralUtility::makeInstance(ClientRepository::class);
         $accessTokenRepository = GeneralUtility::makeInstance(AccessTokenRepository::class);
+        $authorizationCodeRepository = GeneralUtility::makeInstance(AuthorizationCodeRepository::class);
+        $refreshTokenRepository = GeneralUtility::makeInstance(RefreshTokenRepository::class);
         $scopeRepository = new ScopeRepository();
+
         $server = new AuthorizationServer(
             $clientRepository,
             $accessTokenRepository,
             $scopeRepository,
             $this->configuration->getPrivateKeyFile(),
             $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey'],
-            new IdTokenResponse(GeneralUtility::makeInstance(IdentityProvider::class), new ClaimExtractor())
+            new IdTokenResponse(
+                GeneralUtility::makeInstance(IdentityProvider::class),
+                new ClaimExtractor(),
+                $authorizationCodeRepository)
         );
 
 //        $idTokenGrant = new OpenIdConnectGrant(
@@ -63,15 +69,13 @@ final class ServerFactory
 //        $idTokenGrant->setRefreshTokenTTL($this->configuration->getRefreshTokenLifetime());
 
         $authCodeGrant = new AuthCodeGrant(
-            new AuthorizationCodeRepository(),
-            GeneralUtility::makeInstance(RefreshTokenRepository::class),
+            $authorizationCodeRepository,
+            $refreshTokenRepository,
             $this->configuration->getAuthorizationCodeLifetime()
         );
         $authCodeGrant->setRefreshTokenTTL($this->configuration->getRefreshTokenLifetime());
 
-        $refreshTokenGrant = new RefreshTokenGrant(
-            GeneralUtility::makeInstance(RefreshTokenRepository::class),
-        );
+        $refreshTokenGrant = new RefreshTokenGrant($refreshTokenRepository);
         $refreshTokenGrant->setRefreshTokenTTL($this->configuration->getRefreshTokenLifetime());
 
         // Enable grants

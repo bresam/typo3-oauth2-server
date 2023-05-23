@@ -69,7 +69,7 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
                 ->generateUri($this->configuration->getLoginPage())->getPath()
         ) {
             return new RedirectResponse($cookies[self::REDIRECT_COOKIE_NAME], 302, [
-                'Set-Cookie' => sprintf('%s=; path=/; Max-Age=0', self::REDIRECT_COOKIE_NAME, $referer)
+                'Set-Cookie' => sprintf('%s=; path=/; Max-Age=0', self::REDIRECT_COOKIE_NAME)
             ]);
         }
 

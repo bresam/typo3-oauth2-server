@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\OAuth2Server\OpenId;
 
+use FGTCLB\OAuth2Server\Domain\Repository\AuthorizationCodeRepository;
 use FGTCLB\OAuth2Server\DTO\Identity;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Key\LocalFileReference;
@@ -22,11 +23,16 @@ class IdTokenResponse extends BearerTokenResponse
 {
     protected IdentityProviderInterface $identityProvider;
     protected ClaimExtractor $claimExtractor;
+    protected AuthorizationCodeRepository $authorizationCodeRepository;
 
-    public function __construct(IdentityProviderInterface $identityProvider, ClaimExtractor $claimExtractor)
-    {
+    public function __construct(
+        IdentityProviderInterface $identityProvider,
+        ClaimExtractor $claimExtractor,
+        AuthorizationCodeRepository $authorizationCodeRepository
+    ) {
         $this->identityProvider = $identityProvider;
         $this->claimExtractor = $claimExtractor;
+        $this->authorizationCodeRepository = $authorizationCodeRepository;
     }
 
     protected function getBuilder(AccessTokenEntityInterface $accessToken, Identity $userEntity): Builder
@@ -41,13 +47,17 @@ class IdTokenResponse extends BearerTokenResponse
         }
 
         // Add required id_token claims
-        return $builder
+        $builder = $builder
             ->permittedFor($accessToken->getClient()->getIdentifier())
             ->issuedBy('https://' . $_SERVER['HTTP_HOST'])
             ->issuedAt(new \DateTimeImmutable())
             ->expiresAt($expiresAt)
             ->relatedTo($userEntity->getIdentifier())
             ->withClaim('auth_time', $userEntity->getClaims()['lastlogin']);
+
+        // TODO: set nonce if existing on related AuthorizationCode
+
+        return $builder;
     }
 
     protected function getExtraParams(AccessTokenEntityInterface $accessToken): array

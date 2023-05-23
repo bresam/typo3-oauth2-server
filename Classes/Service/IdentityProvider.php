@@ -52,6 +52,21 @@ final class IdentityProvider implements IdentityProviderInterface
         return new Identity($userData ?? []);
     }
 
+    public function getUserInfoByIdentifier($identifier): array
+    {
+        $userData = $this->getUserData($identifier);
+
+        return [
+            'sub' => (string) $userData['uid'],
+            'name' => (string) $userData['name'],
+            'given_name' => (string) $userData['first_name'],
+            'family_name' => (string) $userData['last_name'],
+            'preferred_username' => (string) $userData['username'],
+            'email' => (string) $userData['email'],
+            'picture' => (string) $this->getProfileImageUri($userData),
+        ];
+    }
+
     private function getUserData(string $identifier): array
     {
         $qb = $this->connectionPool->getConnectionForTable(self::FE_USERS)->createQueryBuilder();
