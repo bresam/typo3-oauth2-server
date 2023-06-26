@@ -11,16 +11,10 @@ use League\OAuth2\Server\Exception\OAuthServerException;
 use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class OAuthIntrospectionEndpoint implements OAuthApiEndpointInterface
 {
-    private ClientRepository $clientRepository;
-
-    public function __construct(ClientRepository $clientRepository)
-    {
-        $this->clientRepository = $clientRepository;
-    }
-
     public function isPublic(): bool
     {
         return true;
@@ -62,7 +56,7 @@ class OAuthIntrospectionEndpoint implements OAuthApiEndpointInterface
         if ($request->hasHeader('authorization')) {
             [$clientId, $clientSecret] = explode(':', base64_decode(substr($request->getHeader('authorization')[0], 6)));
 
-            if ($this->clientRepository->validateClient($clientId, $clientSecret, 'openid')) {
+            if (GeneralUtility::makeInstance(ClientRepository::class)->validateClient($clientId, $clientSecret, 'openid')) {
                 return;
             }
         }
