@@ -35,6 +35,7 @@ class OAuthDiscoveryEndpoint implements OAuthApiEndpointInterface
             "authorization_endpoint" => sprintf('%s://%s/oauth/authorize', $requestScheme, $_SERVER['HTTP_HOST']),
             "token_endpoint" => sprintf('%s://%s/oauth/token', $requestScheme, $_SERVER['HTTP_HOST']),
             "userinfo_endpoint" => sprintf('%s://%s/connect/userinfo', $requestScheme, $_SERVER['HTTP_HOST']),
+            "introspection_endpoint" => sprintf('%s://%s/token/introspect', $requestScheme, $_SERVER['HTTP_HOST']),
             "jwks_uri" => sprintf('%s://%s/connect/jwks.json', $requestScheme, $_SERVER['HTTP_HOST']),
 //            "registration_endpoint" => sprintf('%s://%s/connect/register', $requestScheme, $_SERVER['HTTP_HOST']),
             "scopes_supported" => ["openid", "profile", "email", "address", "phone"],
@@ -51,7 +52,7 @@ class OAuthDiscoveryEndpoint implements OAuthApiEndpointInterface
                 "prefered_username", "name", "given_name", "family_name",
                 "picture", "website", "telephone", "email"
             ],
-//            "token_endpoint_auth_methods_supported" => ["client_secret_basic", "private_key_jwt"],
+            "token_endpoint_auth_methods_supported" => ["client_secret_basic", "private_key_jwt"],
 //            "token_endpoint_auth_signing_alg_values_supported" => ["RS256", "ES256"],
 //            "check_session_iframe" => "https://server.example.com/connect/check_session",
 //            "end_session_endpoint" => "https://server.example.com/connect/end_session",
