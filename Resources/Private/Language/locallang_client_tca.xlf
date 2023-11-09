@@ -14,6 +14,9 @@
 			<trans-unit id="client.secret.label">
 				<source>Client Secret</source>
 			</trans-unit>
+			<trans-unit id="client.frontend_user_groups.label">
+				<source>Granted Frontend User Groups</source>
+			</trans-unit>
 			<trans-unit id="client.redirect_uris.label">
 				<source>Valid redirect URIs</source>
 			</trans-unit>

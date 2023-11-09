@@ -51,6 +51,15 @@ return [
                 'autocomplete' => false,
             ]
         ],
+        'frontend_user_groups' => [
+            'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_client_tca.xlf:client.frontend_user_groups.label',
+            'config' => [
+                'type' => 'select',
+                'renderType' => 'selectMultipleSideBySide',
+                'foreign_table' => 'fe_groups',
+                'MM' => 'tx_oauth2server_domain_model_client_fe_user_group_mm',
+            ]
+        ],
         'redirect_uris' => [
             'label' => 'LLL:EXT:oauth2_server/Resources/Private/Language/locallang_client_tca.xlf:client.redirect_uris.label',
             'config' => [
@@ -78,6 +87,6 @@ return [
     ],
     'palettes' => [
         'name' => ['showitem' => 'name, --linebreak--, description'],
-        'credentials' => ['showitem' => 'identifier, --linebreak--, secret'],
+        'credentials' => ['showitem' => 'identifier, --linebreak--, secret, --linebreak--, frontend_user_groups'],
     ],
 ];

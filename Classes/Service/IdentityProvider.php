@@ -29,12 +29,12 @@ final class IdentityProvider implements IdentityProviderInterface
         // map profile properties to oidc specs
         if (!$userData['name']) { unset($userData['name']); }
         if (!$userData['middle_name']) { unset($userData['middle_name']); }
-        if ($userData['lastname']) { $userData['family_name'] = $userData['lastname']; }
-        if ($userData['firstname']) { $userData['given_name'] = $userData['firstname']; }
-        if ($userData['username']) { $userData['preferred_username'] = $userData['username']; }
-        if ($userData['www']) { $userData['website'] = $userData['www']; }
-        if ($userData['tstamp']) { $userData['updated_at'] = $userData['tstamp']; }
-        if ($userData['telephone']) { $userData['phone_number'] = $userData['telephone']; }
+        if (isset($userData['lastname'])) { $userData['family_name'] = $userData['lastname']; }
+        if (isset($userData['firstname'])) { $userData['given_name'] = $userData['firstname']; }
+        if (isset($userData['username'])) { $userData['preferred_username'] = $userData['username']; }
+        if (isset($userData['www'])) { $userData['website'] = $userData['www']; }
+        if (isset($userData['tstamp'])) { $userData['updated_at'] = $userData['tstamp']; }
+        if (isset($userData['telephone'])) { $userData['phone_number'] = $userData['telephone']; }
 
         // set address details
         $userData['address'] = [
@@ -85,7 +85,7 @@ final class IdentityProvider implements IdentityProviderInterface
     {
         $fileReference = $this->fileRepository->findByRelation('fe_users', 'image', (int) $userData['image']);
 
-        if (!$fileReference[0]) {
+        if (!isset($fileReference[0])) {
             if ($userData['email']) {
                 // use gravatar if email address is available and no local profile image exists
                 return sprintf('https://www.gravatar.com/avatar/%s', md5($userData['email']));

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace FGTCLB\OAuth2Server\Middleware;
 
+use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\RFCValidation;
 use FGTCLB\OAuth2Server\Configuration;
 use FGTCLB\OAuth2Server\Domain\Model\Client;
+use FGTCLB\OAuth2Server\Domain\Model\FrontendUserGroup;
 use FGTCLB\OAuth2Server\Domain\Model\Scope;
 use FGTCLB\OAuth2Server\Domain\Model\User;
 use FGTCLB\OAuth2Server\Server\ServerFactory;
@@ -23,6 +26,7 @@ use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Routing\RouterInterface;
 use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
 /**
@@ -103,6 +107,7 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
             }
         }
 
+        // redirect to login of not logged in
         if (!$this->context->getPropertyFromAspect('frontend.user', 'isLoggedIn', false)) {
             $userSession->setData('oauth2.authorizationRequest', serialize($authorizationRequest));
 
@@ -112,7 +117,7 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
         // With TYPO3 11.5.17 it takes 3 loops to unserialize the AuthorizationRequest
         $count = 0;
         while (!$authorizationRequest instanceof AuthorizationRequest && $count < 10) {
-            $authorizationRequest = unserialize($authorizationRequest, ['allowed_classes' => [AuthorizationRequest::class, Client::class, Scope::class]]);
+            $authorizationRequest = unserialize($authorizationRequest, ['allowed_classes' => [AuthorizationRequest::class, Client::class, Scope::class, ObjectStorage::class, FrontendUserGroup::class]]);
             $count++;
         }
 
@@ -125,8 +130,32 @@ final class OAuth2Authorization implements MiddlewareInterface, LoggerAwareInter
             return new RedirectResponse($redirectUri);
         }
 
+        $authorizationRequestApproved = true;
+
+        // deny access when not granted by frontend user group
+        if (!$authorizationRequest->getClient()->hasUserAccess($frontendUser)) {
+            $this->logger->warning(
+                sprintf('User is not granted on this client! Client: %s, UserID: %s', $authorizationRequest->getClient()->getIdentifier(), $frontendUser->user['uid'])
+            );
+
+            $authorizationRequestApproved = false;
+        }
+
+        // deny access when invalid email address
+        if (!(new EmailValidator())->isValid($frontendUser->user['email'], new RFCValidation())) {
+            $this->logger->warning(
+                sprintf('User has invalid email address! Address: %s', $frontendUser->user['email'])
+            );
+
+            $authorizationRequestApproved = false;
+        }
+
+        if ($authorizationRequestApproved) {
+            $this->logger->info(sprintf('Granted auth on client: %s with userID: %s', $authorizationRequest->getClient()->getIdentifier(), $frontendUser->user['uid']));
+        }
+
         $authorizationRequest->setUser(new User((string)$this->context->getPropertyFromAspect('frontend.user', 'id')));
-        $authorizationRequest->setAuthorizationApproved(true);
+        $authorizationRequest->setAuthorizationApproved($authorizationRequestApproved);
 
         $userSession->removeData('oauth2.authorizationRequest');
 
